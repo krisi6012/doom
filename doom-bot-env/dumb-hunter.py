@@ -7,10 +7,8 @@ import time
 import json
 import math
 
-
-
 RESTFUL_HOST = "localhost"
-RESTFUL_PORT = int(raw_input("Which restful port: "))
+RESTFUL_PORT = 6001
 
 
 def sendAction(objectName, payload):
@@ -152,6 +150,17 @@ def moveToPoint(destX, destY, attempts=20, pause=1, accuracy=25):
 
     return False
 
+def myId():
+    players = getAction('players')
+    for dict in players:
+        if(dict['isConsolePlayer']==True):
+            return dict['id']
+
+
+
+
+
+
 
 def findNearestEnemy():
     """Gets all the world objects, finds the enemies, then
@@ -228,115 +237,15 @@ def reorientPlayer(angle, attempts=10, pause=1, accuracy=10):
 
     return False
 
-
-
-def unStuck():
-    canMove = getAction('world/movetest')
-    if(canMove(myId(), )==False):
-        randomAngle = random.randInt(90, 270)
-        reorientPlayer(randomAngle)
-
 def getObjects():
     objects = getAction('world/objects')
     return objects
 
-def objectsCanSee():
-    objects = getObjects()
-    idCanSee = []
-    for dict in objects:
-        if(getAction('world/los/{id1}/{id2}')(id1=myId(), id2 = dict['id'])):
-            idCanSee.append(dict['id'])
 
-    return idCanSee
-
-def objectsIWant(objectsIWantV = []):
-    idCanSee = objectsCanSee()
-    objects = getObjects()
-    distanceFromObjects = {}
-    br = 0
-    for dict in objects:
-        if((dict["id"] in idCanSee) and (dict["type"] in objectsIWantV)):
-            distanceFromObjects[br] = [dict['distance'], dict['id']]
-    return distanceFromObjects
-
-def nearestObject(distanceFromObjects):
-    temp = 999999999
-    id=-1
-    for dist in distanceFromObjects:
-        if(dist[0]<temp):
-            temp=dict[0]
-    for dist in distanceFromObjects:
-        if(dist['distance']==temp):
-            id = dist['id']
-            break
-    return id
-
-def nearestObjectIWant(objectsIWantV = []):
-    return nearestObject(objectsIWant(objectsIWantV))
-
-def playerStatus():
-    playerStatus = getAction('player')
-    if playerStatus['health']<40:
-        idNearestHealthPlus = nearestObjectIWant(["Health Potion +1% health", "Stimpack", "Medikit", "Supercharge", "Med Patch", "Medical Kit", "Surgery Kit"])
-        checkVitals(idNearestHealthPlus)
-#    if(playerStatus['armor']<10):
-#        idNearestHealthPlus = nearestObject(["Armor", "Megaarmor", "Leather Armor", "Metal Armor"])
-#        checkVitals(idNearestHealthPlus)
-    if(playerStatus['ammo']['Bullets']<20):
-        idNearestHealthPlus = nearestObject(["Ammo clip", "Box of ammo", "Box of rockets", "Box of shells", "Cell charge", "Cell charge pack", "Rocket", "Shotgun shells"])
-        checkVitals(idNearestHealthPlus)
-
-        
-def checkVitals(idNearestHealthPlus):
-    objectsCanSeeV = objectsCanSee()
-    br=0
-    if(idNearestHealthPlus==-1):
-        randomAngle = random.randInt(90, 270)
-        reorientPlayer(randomAngle)
-        if(br<3):
-            checkVitals(idNearestHealthPlus)
-            br=br+1
-        else:
-            enemyAttack()
-
-    else:
-        for dict in objectsCanSeeV:
-            if(dict['id']==idNearestHealthPlus):
-                moveToPoint(dict["position"]["x"],dict["position"]["y"])
-
-
-
-def enemyAttack():
-    enemy = findNearestEnemy()
-    print json.dumps(enemy, indent=4)
-    moveToPoint(enemy["position"]["x"], enemy["position"]["y"])
-    shoot()
-
-def myId():
-    players = getAction('players')
-    for dict in players:
-        if(dict['isConsolePlayer']==True):
-            return dict['id']
 
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging.DEBUG)
 
-
-
-
-
-
-
-#enemy = findNearestEnemy()
-#print json.dumps(enemy, indent=4)
-#moveToPoint(enemy["position"]["x"], enemy["position"]["y"])
-#shoot()
-
-
-
-while 1 == 1:
-    #unStuck()
-    spinAmount = int((random.random() * 200.0) - 100)
-    spinPlayer(spinAmount)
-
-    enemyAttack()
-    checkVitals(playerStatus())
+enemy = findNearestEnemy()
+print json.dumps(enemy, indent=4)
+moveToPoint(enemy["position"]["x"], enemy["position"]["y"])
+shoot()
