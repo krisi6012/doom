@@ -273,11 +273,13 @@ def nearestObjectIWant(objectsIWantV = []):
 def playerStatus():
     playerStatus = getAction('player')
     if playerStatus['health']<40:
-        idNearestHealthPlus = nearestObjectIWant(["Stimpack", "Medikit", "Supercharge", "Med Patch", "Medical Kit", "Surgery Kit"])
+        idNearestHealthPlus = nearestObjectIWant(["Health Potion +1% health", "Stimpack", "Medikit", "Supercharge", "Med Patch", "Medical Kit", "Surgery Kit"])
         checkVitals(idNearestHealthPlus)
-        idNearestHealthPlus = nearestObject(["Armor", "Megaarmor", "Leather Armor", "Metal Armor"])
-        checkVitals(idNearestHealthPlus)
-        idNearestHealthPlus = nearestObject([])
+#    if(playerStatus['armor']<10):
+#        idNearestHealthPlus = nearestObject(["Armor", "Megaarmor", "Leather Armor", "Metal Armor"])
+#        checkVitals(idNearestHealthPlus)
+    if(playerStatus['ammo']['Bullets']<20):
+        idNearestHealthPlus = nearestObject(["Ammo clip", "Box of ammo", "Box of rockets", "Box of shells", "Cell charge", "Cell charge pack", "Rocket", "Shotgun shells"])
         checkVitals(idNearestHealthPlus)
 
         
@@ -293,6 +295,7 @@ def checkVitals(idNearestHealthPlus):
 
 
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging.DEBUG)
+
 
 enemy = findNearestEnemy()
 print json.dumps(enemy, indent=4)
