@@ -7,10 +7,8 @@ import time
 import json
 import math
 
-
-
 RESTFUL_HOST = "localhost"
-RESTFUL_PORT = int(raw_input("Which restful port: "))
+RESTFUL_PORT = 6001
 
 
 def sendAction(objectName, payload):
@@ -152,6 +150,13 @@ def moveToPoint(destX, destY, attempts=20, pause=1, accuracy=25):
 
     return False
 
+def myId():
+    players = getAction('players')
+    for dict in players:
+        if(dict['isConsolePlayer']==True):
+            return dict['id']
+
+
 
 def findNearestEnemy():
     """Gets all the world objects, finds the enemies, then
@@ -229,104 +234,26 @@ def reorientPlayer(angle, attempts=10, pause=1, accuracy=10):
     return False
 
 
-
-def unStuck():
-    canMove = getAction('world/movetest')
-    br=0
-    if(canMove(myId(), getX(), getY())):
-        br+=1
-        if(br>=2):
-            randomAngle = random.randInt(90, 270)
-            reorientPlayer(randomAngle)
-
-def getX():
-    return player()['position']['x']
-
-def getY():
-    return player()['position']['y']
-
-def myId():
-    players = getAction('players')
-    for dict in players:
-        if(dict['isConsolePlayer']==True):
-            return dict['id']
-
-def player():
-    return getAction('player')
-
-
-objects = getAction('world/objects')
-
-def objectsCanSee():
-    idCanSee = []
-    for dict in objects:
-        if getAction('world/los/{id1}/{id2}'.format(id1=myId(), id2=dict['id'])):
-            idCanSee.append(dict['id'])
-    return idCanSee
-
-def distanceFromObjectsIWant(objectsIWant = []):
-    distanceFromObjects = {}
-    ids = {}
-    br=0
-    for dict in objects:
-        if(dict["type"] in objectsIWant):
-            distanceFromObjects[br] = dict['distance']
-            ids[br] = dict['id']
-            br+=1
-    return [distanceFromObjects, ids]
-
-
-def nearestObject(distanceFromObjectsAndId):
-    temp = 999999999
-    id=-1
-    br=0
-    for dist in distanceFromObjectsAndId[0]:
-        if(dist[br]<temp):
-            temp=dict[br]
-            id=br
-        br+=1
-    return distanceFromObjectsAndId[1][id]
-
-
-def nearestObjectIWant(objectsIWant = []):
-    return nearestObject(distanceFromObjectsIWant(objectsIWant))
-
-def checkHealth():
-    if playerStatus()['health']<30:
-        idNearestHealthPlus = nearestObjectIWant(["Health Potion +1% health", "Stimpack", "Medikit", "Supercharge", "Med Patch", "Medical Kit", "Surgery Kit"])
-        return idNearestHealthPlus
-
-def checkAmmo():
-    if playerStatus()['ammo']['Bullets']<15:
-        idNearestAmmoPlus = nearestObjectIWant(["Ammo clip", "Box of ammo", "Box of rockets", "Box of shells", "Cell charge", "Cell charge pack", "Rocket", "Shotgun shells"])
-        return idNearestAmmoPlus
-
-
-def enemyAttack():
-    enemy = findNearestEnemy()
-    print json.dumps(enemy, indent=4)
-    moveToPoint(enemy["position"]["x"], enemy["position"]["y"])
-    shoot()
-
-
+sendAction('player', {'type': "turn-left", 'amount': 15})
+time.sleep(1)
+movePlayer(115)
+time.sleep(2)
+sendAction('player', {'type': "turn-right", 'amount': 15})
+time.sleep(2)
+sendAction('player', {'type': "strafe-right", 'amount': 85})
+time.sleep(4)
+sendAction('player', {'type': "strafe-left", 'amount': 30})
+time.sleep(2)
+movePlayer(150)
+time.sleep(3)
+sendAction('player', {'type': "strafe-left", 'amount': 10})
+time.sleep(1)
+movePlayer(30)
 
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging.DEBUG)
 
+enemy = findNearestEnemy()
+print json.dumps(enemy, indent=4)
+moveToPoint(enemy["position"]["x"], enemy["position"]["y"])
+shoot()
 
-
-
-
-#enemy = findNearestEnemy()
-#print json.dumps(enemy, indent=4)
-#moveToPoint(enemy["position"]["x"], enemy["position"]["y"])
-#shoot()
-
-
-
-while 1 == 1:
-    #unStuck()
-    spinAmount = int((random.random() * 200.0) - 100)
-    spinPlayer(spinAmount)
-
-    enemyAttack()
-    #checkVitals(playerStatus())
