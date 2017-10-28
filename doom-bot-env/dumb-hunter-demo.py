@@ -241,12 +241,56 @@ def objectsCanSee():
     idCanSee = []
     for dict in objects:
         if(getAction('world/los/{id1}/{id2}')(id1=0, id2 = dict["typeId"]):
-            idCanSee.append(dict["typeId"])
+            idCanSee.append(dict["Id"])
 
     return idCanSee
 
+def objectsIWant(objectsIWantV = []):
+    idCanSee = objectsCanSee()
+    objects = getObjects()
+    distanceFromObjects = {}
+    br = 0
+    for dict in objects:
+        if((dict["id"] in idCanSee) and (dict["type"] in objectsIWantV)):
+            distanceFromObjects[br] = [dict['distance'], dict['id']]
+    return distanceFromObjects
 
-    
+def nearestObject(distanceFromObjects):
+    temp = 999999999
+    id=-1
+    for dist in distanceFromObjects:
+        if(dist[0]<temp):
+            temp=dict[0]
+    for dist in distanceFromObjects:
+        if(dist['distance']==temp):
+            id = dist['id']
+            break
+    return id
+
+def nearestObjectIWant(objectsIWantV = []):
+    return nearestObject(objectsIWant(objectsIWantV))
+
+def playerStatus():
+    playerStatus = getAction('player')
+    if playerStatus['health']<40:
+        idNearestHealthPlus = nearestObjectIWant(["Stimpack", "Medikit", "Supercharge", "Med Patch", "Medical Kit", "Surgery Kit"])
+        checkVitals(idNearestHealthPlus)
+        idNearestHealthPlus = nearestObject(["Armor", "Megaarmor", "Leather Armor", "Metal Armor"])
+        checkVitals(idNearestHealthPlus)
+        idNearestHealthPlus = nearestObject([])
+        checkVitals(idNearestHealthPlus)
+
+        
+def checkVitals(idNearestHealthPlus):
+    objectsCanSee = objectsCanSee()
+    if(idNearestHealthPlus==-1):
+        nothingToSee()
+    else:
+        for dict in objectsCanSee():
+            if(dict['id']==idNearestHealthPlus):
+                moveToPoint(idNearestHealthPlus['position']['x'],idNearestHealthPlus['position']['y'])
+
+
 
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging.DEBUG)
 
