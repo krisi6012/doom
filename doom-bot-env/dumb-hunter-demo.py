@@ -257,9 +257,9 @@ def player():
 
 objects = getAction('world/objects')
 
-def objectsCanSee():
+def objectsCanSee(obj):
     idCanSee = []
-    for dict in objects:
+    for dict in obj:
         if getAction('world/los/{id1}/{id2}'.format(id1=myId(), id2=dict['id'])):
             idCanSee.append(dict['id'])
     return idCanSee
@@ -301,12 +301,24 @@ def checkAmmo():
         idNearestAmmoPlus = nearestObjectIWant(["Ammo clip", "Box of ammo", "Box of rockets", "Box of shells", "Cell charge", "Cell charge pack", "Rocket", "Shotgun shells"])
         return idNearestAmmoPlus
 
+def playerInFront():
+    return enemy['id'] in objectsCanSee(getAction('players'))
+def moveplayerInFront():
+    if(playerInFront):
+        shoot()
+    else:
+        spinAmount = int((random.random() * 200.0) - 100)
+        spinPlayer(spinAmount)
+        moveplayerInFront()
+
 
 def enemyAttack():
     enemy = findNearestEnemy()
     print json.dumps(enemy, indent=4)
     moveToPoint(enemy["position"]["x"], enemy["position"]["y"])
-    shoot()
+    moveplayerInFront()
+    
+
 
 
 
