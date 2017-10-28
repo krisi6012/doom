@@ -6,7 +6,7 @@ import random
 import time
 
 RESTFUL_HOST = "localhost"
-RESTFUL_PORT = 6001
+RESTFUL_PORT = int(raw_input("Which restful port: "))
 
 
 def sendAction(objectName, payload):

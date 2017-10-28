@@ -7,8 +7,10 @@ import time
 import json
 import math
 
+
+
 RESTFUL_HOST = "localhost"
-RESTFUL_PORT = 6002
+RESTFUL_PORT = int(raw_input("Which restful port: "))
 
 
 def sendAction(objectName, payload):
@@ -288,7 +290,7 @@ def checkVitals(idNearestHealthPlus):
     br=0
     if(idNearestHealthPlus==-1):
         randomAngle = random.randInt(90, 270)
-        reorientPlayer()
+        reorientPlayer(randomAngle)
         if(br<3):
             checkVitals(idNearestHealthPlus)
             br=br+1
@@ -296,9 +298,9 @@ def checkVitals(idNearestHealthPlus):
             enemyAttack()
 
     else:
-        for dict in objectsCanSee():
+        for dict in objectsCanSee:
             if(dict['id']==idNearestHealthPlus):
-                moveToPoint(idNearestHealthPlus['position']['x'],idNearestHealthPlus['position']['y'])
+                moveToPoint(dict["position"]["x"],dict["position"]["y"])
 
 
 
@@ -315,6 +317,12 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=loggin
 spinAmount = int((random.random() * 200.0) - 100)
 spinPlayer(spinAmount)
 time.sleep(10)
+
+
+enemy = findNearestEnemy()
+print json.dumps(enemy, indent=4)
+moveToPoint(enemy["position"]["x"], enemy["position"]["y"])
+shoot()
 
 while 1 == 1:
     enemyAttack()
