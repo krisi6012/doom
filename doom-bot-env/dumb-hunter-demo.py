@@ -226,6 +226,27 @@ def reorientPlayer(angle, attempts=10, pause=1, accuracy=10):
 
     return False
 
+def unStuck():
+    canMove = getAction('world/movetest')
+    if(canMove==False):
+        randomAngle = random.randInt(90, 270)
+        reorientPlayer()
+
+def getObjects():
+    objects = getAction('world/objects')
+    return objects
+
+def objectsCanSee():
+    objects = getObjects()
+    idCanSee = []
+    for dict in objects:
+        if(getAction('world/los/{id1}/{id2}')(id1=0, id2 = dict["typeId"]):
+            idCanSee.append(dict["typeId"])
+
+    return idCanSee
+
+
+    
 
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging.DEBUG)
 
