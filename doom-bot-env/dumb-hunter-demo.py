@@ -8,7 +8,7 @@ import json
 import math
 
 RESTFUL_HOST = "localhost"
-RESTFUL_PORT = 6001
+RESTFUL_PORT = 6002
 
 
 def sendAction(objectName, payload):
@@ -312,12 +312,10 @@ def enemyAttack():
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging.DEBUG)
 
 
-enemy = findNearestEnemy()
-print json.dumps(enemy, indent=4)
-moveToPoint(enemy["position"]["x"], enemy["position"]["y"])
-shoot()
+spinAmount = int((random.random() * 200.0) - 100)
+spinPlayer(spinAmount)
+time.sleep(10)
 
-
-enemyAttack()
-checkVitals(playerStatus())
-
+while 1 == 1:
+    enemyAttack()
+    checkVitals(playerStatus())
