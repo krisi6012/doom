@@ -240,7 +240,7 @@ def objectsCanSee():
     objects = getObjects()
     idCanSee = []
     for dict in objects:
-        if(getAction('world/los/{id1}/{id2}')(id1=0, id2 = dict["typeId"]):
+        if(getAction('world/los/{id1}/{id2}')(id1=0, id2 = dict["typeId"])):
             idCanSee.append(dict["Id"])
 
     return idCanSee
@@ -285,13 +285,28 @@ def playerStatus():
         
 def checkVitals(idNearestHealthPlus):
     objectsCanSee = objectsCanSee()
+    br=0
     if(idNearestHealthPlus==-1):
-        nothingToSee()
+        randomAngle = random.randInt(90, 270)
+        reorientPlayer()
+        if(br<3):
+            checkVitals(idNearestHealthPlus)
+            br=br+1
+        else:
+            enemyAttack()
+
     else:
         for dict in objectsCanSee():
             if(dict['id']==idNearestHealthPlus):
                 moveToPoint(idNearestHealthPlus['position']['x'],idNearestHealthPlus['position']['y'])
 
+
+
+def enemyAttack():
+    enemy = findNearestEnemy()
+    print json.dumps(enemy, indent=4)
+    moveToPoint(enemy["position"]["x"], enemy["position"]["y"])
+    shoot()
 
 
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging.DEBUG)
@@ -301,3 +316,8 @@ enemy = findNearestEnemy()
 print json.dumps(enemy, indent=4)
 moveToPoint(enemy["position"]["x"], enemy["position"]["y"])
 shoot()
+
+
+enemyAttack()
+checkVitals(playerStatus())
+
