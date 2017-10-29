@@ -70,6 +70,8 @@ def movePlayer(amount):
 def shoot():
     sendAction('player', {'type': 'shoot'})
 
+def use():
+    sendAction('player', {'type': 'use'})
 
 def distanceBetweenPoints(x1, y1, x2, y2):
     dist = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
@@ -83,11 +85,11 @@ def simpleTrig(player_x,player_y,enemy_x,enemy_y):
     )
 
 
-
-def moveToPoint(enemy, attempts=1, pause=2, accuracy=25):
+def moveToPoint(enemy, attempts=1, pause=1, accuracy=25):
     """Try to move in a straight line from where we are to a destination
     point in a finite amount of steps. Z axis is disregarded
     """
+
     currentData = getAction('player')
 
     destX = enemy["position"]["x"]
@@ -111,12 +113,10 @@ def moveToPoint(enemy, attempts=1, pause=2, accuracy=25):
 
     if angle < 0:
         angle = 360 - abs(angle)
-
-    spinPlayer(angle)
+    #spinPlayer(angle)
 
     movePlayer(10) #change to walk to enemy only if needed
 
-    time.sleep(pause)
 
     return False
 
@@ -251,7 +251,7 @@ def checkHealth():
 
 
 def checkAmmo():
-    if playerStatus()['ammo']['Bullets'] < 15:
+    if playerStatus()['ammo']['Bullets'] < 12:
         idNearestAmmoPlus = nearestObjectIWant(
             ["Ammo clip", "Box of ammo", "Box of rockets", "Box of shells", "Cell charge", "Cell charge pack", "Rocket",
              "Shotgun shells"])
@@ -259,10 +259,20 @@ def checkAmmo():
 
 
 def tryShoot(enemy):
+    print objectsCanSee(getAction('players'))
     if (enemy['id'] in objectsCanSee(getAction('players')) and enemy['distance'] < 300):
         shoot()
 
+def playerInFront():
+    enemy = findNearestEnemy()
+    return enemy['id'] in objectsCanSee(getAction('players'))
 
+
+def moveplayerInFront():
+    while(playerInFront!=True):
+        spinAmount = int((random.random() * 200.0) - 100)
+        spinPlayer(spinAmount)
+    shoot()
 
 
 def enemyAttack():
@@ -272,16 +282,29 @@ def enemyAttack():
     tryShoot(enemy)
 
 
+def ifAttacked(healthL):
+    if(healthL==100): healthLB=100
+    if(healthLB!=healthL):
+        if(healthL!=0):
+            nearestObjectIWant(checkHealth())
+            nearestObjectIWant(checkAmmo())
+        else:
+            use()
+    healthLB = healthL
+    return healthLB
+
+
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s')
 # enemy = findNearestEnemy()
 # print json.dumps(enemy, indent=4)
 # moveToPoint(enemy["position"]["x"], enemy["position"]["y"])
 # shoot()
 
-
-
+health=100
+br=0
 while 1 == 1:
     # unStuck()
 
     enemyAttack()
+    health = ifAttacked(health)
     # checkVitals(playerStatus())
